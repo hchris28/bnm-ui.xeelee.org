@@ -1,5 +1,7 @@
 <?php
 
+$env = parse_ini_file(__DIR__ . '.env');
+
 if (!isset($_FILES['file'])) {
     send_slack_message('An upload request was received but no file was posted.');
     exit_and_return_json([
@@ -35,8 +37,8 @@ if (in_array($data_format, $data_formats) === false) {
 }
 
 if (empty($errors) == true) {
-    $desitnation = __DIR__ . "/../importer/incoming_data/{$data_format}/{$file_name}";
-    move_uploaded_file($file_tmp, $desitnation);
+    $destination = __DIR__ . "/../importer/incoming_data/{$data_format}/{$file_name}";
+    move_uploaded_file($file_tmp, $destination);
     send_slack_message("File {$file_name} was uploaded successfully.");
     exit_and_return_json([
         'status' => 'success',
@@ -64,7 +66,9 @@ function exit_and_return_json($data)
 
 function send_slack_message($message)
 {
-    $url = "https://hooks.slack.com/services/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";
+    global $env;
+    
+    $url = $env["REACT_APP_SLACK_HOOK"];
     $useragent = "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)";
     $payload = 'payload={"channel": "#notification", "username": "webhookbot", "text": "' . $message . '", "icon_emoji": ":ghost:"}';
 
