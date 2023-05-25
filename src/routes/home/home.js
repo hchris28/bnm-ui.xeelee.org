@@ -10,7 +10,7 @@ const Home = () => {
     return (
         <Box padding={5}>
             <Heading>Material Management Portal</Heading>
-            <Text>Created for Burns & McDonnell for demonstration purposes only.</Text>
+            <Text>This is a prototype for demonstration purposes only.</Text>
             {user
                 ? (
                     <Flex align="center" gap={10} mt={25}>
