@@ -1,16 +1,19 @@
 import React from 'react'
-import { Card, CardHeader, CardBody, Heading, Box, Text } from '@chakra-ui/react';
+import { Card, CardHeader, CardBody, Heading, Box, Text, Divider } from '@chakra-ui/react';
 import Badges from './badges';
 
 const QueryResults = ({
     items,
-    setSelectedItem = () => {}
+    message,
+    setSelectedItem = () => { }
 }) => {
 
     console.log(Date.now(), 'query results rendered');
 
     return (
         <>
+            {message}
+            <Divider />
             {items.map((item) => {
                 return (
                     <Card
@@ -28,7 +31,7 @@ const QueryResults = ({
                             </Box>
                             <Text>{item._date}</Text>
                             <Text fontSize='.875rem'>
-                                <em>Container ID:</em> <strong>{item.container_id}</strong> 
+                                <em>Container ID:</em> <strong>{item.container_id}</strong>
                                 <br />
                                 <em>Bill of Lading:</em> <strong>{item.bill_of_lading}</strong>
                             </Text>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useReducer } from 'react'
 import {
-    Grid, GridItem, Box, Divider, Text, Button,
+    Grid, GridItem, Box, Text, Button,
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
+    VStack, Spinner
 } from '@chakra-ui/react';
 import MapContainer from '../map-container/map-container';
+import QueryInstructions from '../query-instructions/query-instructions';
 import QueryResults from './query-results';
 import Detail from './detail';
 import QueryForm, { defaultQueryState, queryInputReducer } from './query-form';
@@ -52,6 +54,8 @@ const InventoryQueryUI = () => {
     const [selectedCluster, setSelectedCluster] = useState(null);
     const onClusterDetailClose = () => { setSelectedCluster(null); }
 
+    const [isloading, setIsLoading] = useState(false);
+
     const doQuery = async () => {
         const queryResponse = await postData(
             '/field_scan/list',
@@ -83,6 +87,7 @@ const InventoryQueryUI = () => {
 
     const handleQuerySubmit = (e) => {
         e.preventDefault();
+        setIsLoading(true);
         (async () => {
             try {
                 const queryResponse = await doQuery();
@@ -102,6 +107,7 @@ const InventoryQueryUI = () => {
                 console.dir(error);
             } finally {
                 // indicate query is complete
+                setIsLoading(false);
             }
         })();
     };
@@ -135,24 +141,23 @@ const InventoryQueryUI = () => {
                 </GridItem>
                 <GridItem bgColor="#fff " height="calc(100vh - 85px)" overflowY="scroll">
                     <Box margin={25}>
-                        {!queryResult.message
+                        {isloading
                             ? (
-                                <>
-                                    <Text>
-                                        Use the search form to the left to find specific inventory.
-                                    </Text>
-                                    <Text mt={4}>
-                                        Leave the form blank and click Submit to see recent activity.
-                                    </Text>
-                                </>
-                            ) : (
-                                <>
-                                    {queryResult.message}
-                                    <Divider />
+                                <VStack>
+                                    <Spinner size='xl' />
+                                    <Text>Searching...</Text>
+                                </VStack>
+                            )
+                            : (queryResult.totalRecords === 0
+                                ? (
+                                    <QueryInstructions />
+                                ) : (
                                     <QueryResults
                                         items={queryResult.data}
-                                        setSelectedItem={setSelectedItem} />
-                                </>
+                                        message={queryResult.message}
+                                        setSelectedItem={setSelectedItem}
+                                    />
+                                )
                             )
                         }
                     </Box>

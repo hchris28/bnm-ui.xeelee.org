@@ -1,13 +1,16 @@
 import React from 'react'
-import { Card, CardHeader, CardBody, Heading, Box, Text } from '@chakra-ui/react';
+import { Card, CardHeader, CardBody, Heading, Box, Text, Divider } from '@chakra-ui/react';
 import Badges from './badges';
 
 const ItemList = ({
     items,
-    setSelectedItem = () => {}
+    message,
+    setSelectedItem = () => { }
 }) => {
     return (
         <>
+            {message}
+            <Divider />
             {items.map((item) => {
                 return (
                     <Card

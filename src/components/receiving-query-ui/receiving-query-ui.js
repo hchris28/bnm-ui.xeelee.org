@@ -1,9 +1,10 @@
 import React, { useState, useReducer } from 'react'
 import {
-    Grid, GridItem, Box, Divider, Text
+    Grid, GridItem, Box, Spinner, VStack, Text
 } from '@chakra-ui/react';
 import QueryForm, { defaultQueryState, queryInputReducer } from './query-form';
 import MapContainer from '../map-container/map-container';
+import QueryInstructions from '../query-instructions/query-instructions';
 import QueryResults from './query-results';
 import Detail from './detail';
 import { postData } from '../../utility/post-data';
@@ -14,12 +15,14 @@ const ReceivingQueryUi = () => {
 
     const [queryResult, setQueryResult] = useState({
         status: "",
-        message: '',
+        message: "",
         data: [],
         totalRecords: 0
     });
 
     const [selectedItem, setSelectedItem] = useState(null);
+
+    const [isloading, setIsLoading] = useState(false);
 
     const onItemDetailClose = () => {
         setSelectedItem(null);
@@ -39,6 +42,7 @@ const ReceivingQueryUi = () => {
 
     const handleQuerySubmit = (e) => {
         e.preventDefault();
+        setIsLoading(true);
         (async () => {
             try {
                 const queryResponse = await doQuery();
@@ -58,6 +62,7 @@ const ReceivingQueryUi = () => {
                 console.dir(error);
             } finally {
                 // indicate query is complete
+                setIsLoading(false);
             }
         })();
     };
@@ -90,27 +95,23 @@ const ReceivingQueryUi = () => {
 
                 <GridItem bgColor="#fff " height="calc(100vh - 85px)" overflowY="scroll">
                     <Box margin={25}>
-                        {!queryResult.message
+                        {isloading
                             ? (
-                                <>
-                                    <Text>
-                                        Use the search form to the left to find a specific receiving log entry.
-                                    </Text>
-                                    <Text mt={4}>
-                                        Leave the form blank and click Submit to see recent activity.
-                                    </Text>
-                                </>
-                            ) : (
-                                <>
-                                    <>
-                                        {queryResult.message}
-                                        <Divider />
-                                        <QueryResults
-                                            items={queryResult.data}
-                                            setSelectedItem={setSelectedItem}
-                                        />
-                                    </>
-                                </>
+                                <VStack>
+                                    <Spinner size='xl' />
+                                    <Text>Searching...</Text>
+                                </VStack>
+                            )
+                            : (queryResult.totalRecords === 0
+                                ? (
+                                    <QueryInstructions />
+                                ) : (
+                                    <QueryResults
+                                        items={queryResult.data}
+                                        message={queryResult.message}
+                                        setSelectedItem={setSelectedItem}
+                                    />
+                                )
                             )
                         }
                     </Box>
